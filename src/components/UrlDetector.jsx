@@ -76,7 +76,7 @@ export default function UrlDetector() {
         <div className="card">
             <div className="card-header">
                 <h2>Malicious URL Detector</h2>
-                <a href="/">Back To Home</a>
+                <a href="../index.html">Back To Home</a>
             </div>
 
             <div className="input-grp">
