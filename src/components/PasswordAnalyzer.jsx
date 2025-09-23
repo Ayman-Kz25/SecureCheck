@@ -64,7 +64,7 @@ export default function PasswordAnalyzer() {
       <div className="card">
         <div className="card-header">
           <h2>Password Analyzer</h2>
-          <a href="../index.html">Back To Home</a>
+          <a href="/SecureCheck/">Back To Home</a>
         </div>
 
         <div className="input-grp">
