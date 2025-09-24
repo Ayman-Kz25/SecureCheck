@@ -44,6 +44,7 @@ export default function UrlDetector() {
       const suspiciousCharsRegex = /[^a-z0-9.-]/;
       const suspiciousPathRegex = /[^a-z0-9\/._?=&-]/i;
 
+      //General Checks
       if (u.protocol !== "https:") flags.push("Not using HTTPS");
       if (target.includes("@")) flags.push("Contains @ Symbol");
       if (isIPv4(hostname)) flags.push("Uses IP address instead of domain");
@@ -54,6 +55,7 @@ export default function UrlDetector() {
       if (suspiciousPathRegex.test(path))
         flags.push("Contains unusual/suspicious characters in Query");
 
+      //Key-word based checks
       if (
         SUSPICIOUS_KEYWORDS.some(
           (k) => hostname.includes(k) || path.includes(k)
@@ -62,78 +64,76 @@ export default function UrlDetector() {
         flags.push("Contain Suspicious keywords");
       }
 
-      if (
-        SAFE_DOMAINS.some((d) => hostname === d || hostname.endsWith("." + d))
-      ) {
-        if (
-          SUSPICIOUS_KEYWORDS.some((k) => path.includes(k)) ||
-          suspiciousPathRegex.test(path)
-        ) {
-          flags.push("Suspicious Content even on a trusted domain");
-        } else {
-          setResult({ url: u.href, flags: [], verdict: "Likely Safe" });
-          return;
-        }
+      // Check for exact safe domains (main domain or subdomains)
+      const isSafeDomain = SAFE_DOMAINS.some(
+        (d) => hostname === d || hostname.endsWith("." + d)
+      );
+
+      if (isSafeDomain && flags.length === 0) {
+        setResult({ url: u.href, flags: [], verdict: "Likely Safe" });
+        return;
+      } else if(isSafeDomain && flags.length > 0){
+        flags.push("Suspicious use of a trusted domain (possible phishing)");
       }
 
       const verdict =
-        flags.length >= 2
-          ? "Suspicious"
-          : flags.length === 1
+      flags.length >= 2
+        ? "Suspicious"
+        : flags.length === 1
           ? "Maybe Suspicious"
           : "Likely Safe";
 
-      setResult({ url: u.href, flags, verdict });
-    } catch {
-      setResult({ error: "Invalid URL" });
-    }
+    setResult({ url: u.href, flags, verdict });
+  } catch {
+    setResult({ error: "Invalid URL" });
   }
+}
 
-  return (
-    <div className="page">
-      <div className="card">
-        <div className="card-header">
-          <h2>Malicious URL Detector</h2>
-          <a href="/SecureCheck/">Back To Home</a>
-        </div>
-
-        <div className="input-grp">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="https://example.com/login"
-          />
-          <button onClick={() => analyze(input)}>Analyze</button>
-        </div>
-
-        {result &&
-          (result.error ? (
-            <p className="error">{result.error}</p>
-          ) : (
-            <div className="result">
-              <p>
-                <strong>Verdict: </strong>
-                <span className="result-text">{result.verdict}</span>
-              </p>
-              <p>
-                <strong>URL: </strong>
-                <span className="result-text">{result.url}</span>
-              </p>
-              {result.flags.length > 0 ? (
-                <ul>
-                  {result.flags.map((f, i) => (
-                    <li key={i}>
-                      <i class="fa-solid fa-triangle-exclamation"></i>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No suspicious flags detected.</p>
-              )}
-            </div>
-          ))}
+return (
+  <div className="page">
+    <div className="card">
+      <div className="card-header">
+        <h2>Malicious URL Detector</h2>
+        <a href="/SecureCheck/">Back To Home</a>
       </div>
+
+      <div className="input-grp">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="https://example.com/login"
+        />
+        <button onClick={() => analyze(input)}>Analyze</button>
+      </div>
+
+      {result &&
+        (result.error ? (
+          <p className="error">{result.error}</p>
+        ) : (
+          <div className="result">
+            <p>
+              <strong>Verdict: </strong>
+              <span className="result-text">{result.verdict}</span>
+            </p>
+            <p>
+              <strong>URL: </strong>
+              <span className="result-text">{result.url}</span>
+            </p>
+            {result.flags.length > 0 ? (
+              <ul>
+                {result.flags.map((f, i) => (
+                  <li key={i}>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No suspicious flags detected.</p>
+            )}
+          </div>
+        ))}
     </div>
-  );
+  </div>
+);
 }
