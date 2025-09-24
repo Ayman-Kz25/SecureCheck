@@ -16,7 +16,15 @@ const SUSPICIOUS_KEYWORDS = [
   "paypal",
 ];
 
-const SAFE_DOMAINS = ["google.com", "linkedin.com", "microsoft.com", "github.com", "chatgpt.com", "pinterest.com", "youtube.com"];
+const SAFE_DOMAINS = [
+  "google.com",
+  "linkedin.com",
+  "microsoft.com",
+  "github.com",
+  "chatgpt.com",
+  "pinterest.com",
+  "youtube.com",
+];
 
 export default function UrlDetector() {
   const [input, setInput] = useState("");
@@ -36,19 +44,15 @@ export default function UrlDetector() {
       const suspiciousCharsRegex = /[^a-z0-9.-]/;
       const suspiciousPathRegex = /[^a-z0-9\/._?=&-]/i;
 
-      if(SAFE_DOMAINS.some(d => hostname.includes(d))) {
-        setResult({url: u.href, flags: [], verdict: "Likely Safe"});
-        return;
-      }
-
       if (u.protocol !== "https:") flags.push("Not using HTTPS");
       if (target.includes("@")) flags.push("Contains @ Symbol");
       if (isIPv4(hostname)) flags.push("Uses IP address instead of domain");
       if (hostname.split(".").length >= 4) flags.push("Many subdomains");
       if (target.length > 75) flags.push("Long URL (>75 chars)");
-      if(suspiciousCharsRegex.test(hostname)) flags.push("Contains unusual/suspicious characters in link")
-      if(suspiciousPathRegex.test(path)) flags.push("Contains unusual/suspicious characters in Query")
-
+      if (suspiciousCharsRegex.test(hostname))
+        flags.push("Contains unusual/suspicious characters in link");
+      if (suspiciousPathRegex.test(path))
+        flags.push("Contains unusual/suspicious characters in Query");
 
       if (
         SUSPICIOUS_KEYWORDS.some(
@@ -56,6 +60,20 @@ export default function UrlDetector() {
         )
       ) {
         flags.push("Contain Suspicious keywords");
+      }
+
+      if (
+        SAFE_DOMAINS.some((d) => hostname === d || hostname.endsWith("." + d))
+      ) {
+        if (
+          SUSPICIOUS_KEYWORDS.some((k) => path.includes(k)) ||
+          suspiciousPathRegex.test(path)
+        ) {
+          flags.push("Suspicious Content even on a trusted domain");
+        } else {
+          setResult({ url: u.href, flags: [], verdict: "Likely Safe" });
+          return;
+        }
       }
 
       const verdict =
@@ -71,36 +89,51 @@ export default function UrlDetector() {
     }
   }
 
-  return(
+  return (
     <div className="page">
-        <div className="card">
-            <div className="card-header">
-                <h2>Malicious URL Detector</h2>
-                <a href="/SecureCheck/">Back To Home</a>
-            </div>
-
-            <div className="input-grp">
-                <input value={input} onChange={e => setInput(e.target.value)} placeholder="https://example.com/login"/>
-                <button onClick={() => analyze(input)}>Analyze</button>
-            </div>
-
-            {result && (
-                result.error ? <p className="error">{result.error}</p> : (
-                    <div className="result">
-                        <p><strong>Verdict: </strong><span className="result-text">{result.verdict}</span></p>
-                        <p><strong>URL: </strong><span className="result-text">{result.url}</span></p>
-                        {result.flags.length > 0 ? (
-                            <ul>
-                                {result.flags.map((f,i) => 
-                                <li key={i}><i class="fa-solid fa-triangle-exclamation"></i>{f}</li>
-                                )}
-                            </ul>
-                        ) : <p>No suspicious flags detected.</p>
-                    }
-                    </div>
-                )
-            )}
+      <div className="card">
+        <div className="card-header">
+          <h2>Malicious URL Detector</h2>
+          <a href="/SecureCheck/">Back To Home</a>
         </div>
+
+        <div className="input-grp">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="https://example.com/login"
+          />
+          <button onClick={() => analyze(input)}>Analyze</button>
+        </div>
+
+        {result &&
+          (result.error ? (
+            <p className="error">{result.error}</p>
+          ) : (
+            <div className="result">
+              <p>
+                <strong>Verdict: </strong>
+                <span className="result-text">{result.verdict}</span>
+              </p>
+              <p>
+                <strong>URL: </strong>
+                <span className="result-text">{result.url}</span>
+              </p>
+              {result.flags.length > 0 ? (
+                <ul>
+                  {result.flags.map((f, i) => (
+                    <li key={i}>
+                      <i class="fa-solid fa-triangle-exclamation"></i>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No suspicious flags detected.</p>
+              )}
+            </div>
+          ))}
+      </div>
     </div>
-  )
+  );
 }
