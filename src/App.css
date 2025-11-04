@@ -321,141 +321,106 @@ footer strong {
     font-weight: 500;
 }
 
-/* Spam Email Detector Page */
-.mailText-grp {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+/* Phishing Email Detector Page */
+.card label {
+    color: #f1f5f9;
+    margin-bottom: 5px;
 }
 
-.mailText-grp textarea {
-    width: 100%;
-  padding: 1.2rem;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-radius: 12px;
-  font-size: 1rem;
-  line-height: 1.6;
-  background: rgba(255, 255, 255, 0.15);
-  color: #f1f5f9;
-  resize: none;
-  outline: none;
-  transition: all 0.3s ease;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
-
-.mailText-grp textarea::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.mailText-grp textarea:focus {
-  border-color: #f4b1c2;
-  box-shadow: 0 0 15px rgba(244, 177, 194, 0.4);
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.mailText-grp button {
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #001d4f, #f4b1c2);
-  color: #fff;
-  border: none;
+.card input,
+.card textarea {
+  width: 100%;
+  padding: 1rem;
   border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.mailText-grp button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(244, 177, 194, 0.3);
-}
-
-.risk-level {
-  margin-top: 2rem;
-  text-align: center;
-  animation: fadeIn 0.6s ease;
-}
-
-.risk-level h3 {
-  font-size: 1.3rem;
-  font-weight: bold;
+  border: none;
+  background: rgba(255, 255, 255, 0.22);
   color: #fff;
-  margin-bottom: 0.8rem;
+  margin: 0.5rem 0 1rem;
+  outline: none;
 }
+
+.card input::placeholder,
+.card textarea::placeholder{
+    color: #fee2e2;
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 0.8rem 1.3rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #001d4f, #f4b1c2);
+  color: white;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.risk-section {
+  margin-top: 1rem;
+  color: #f1f5f9;
+}
+
+.risk-text.low { color: #10b981; }
+.risk-text.medium { color: #f59e0b; }
+.risk-text.high { color: #ef4444; }
 
 .risk-bar {
-  margin: 0 auto;
   width: 100%;
-  height: 12px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 10px;
+  background: #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   overflow: hidden;
-  position: relative;
 }
 
-.risk-bar::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
+.risk-bar-fill {
   height: 100%;
-  border-radius: 6px;
-  width: var(--risk-width, 0%);
-  background: var(--risk-color, #22c55e);
-  transition: width 0.5s ease, background-color 0.4s ease;
+  width: 100%;
+  transition: background-color 0.4s ease;
 }
 
-.result-list {
+.risk-bar-fill.low { width: 33%; background: #10b981; }
+.risk-bar-fill.medium { width: 66%; background: #f59e0b; }
+.risk-bar-fill.high { width: 100%; background: #ef4444; }
+
+.results-list {
   list-style: none;
-  margin-top: 2rem;
   padding: 0;
-  animation: fadeIn 0.7s ease;
+  margin-top: 1rem;
+  color: #fee2e2;
 }
 
-.result-list li {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-left: 5px solid #facc15;
-  border-radius: 10px;
-  margin-bottom: 0.9rem;
-  color: #fff;
-  font-weight: 500;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  transition: transform 0.2s ease, background-color 0.3s ease;
-}
-
-.result-list li i {
-  color: #facc15;
-  font-size: 1.2rem;
-}
-
-.safe {
-  color: #4ade80;
-  font-weight: 600;
-  text-align: center;
-  margin-top: 1.5rem;
-  background: rgba(34, 197, 94, 0.15);
+.results-list li {
+  background: rgba(255, 255, 255, 0.18);
+  border-left: 4px solid #facc15;
+  padding: 0.7rem 1rem;
   border-radius: 8px;
-  padding: 0.8rem;
-  border-left: 4px solid #4ade80;
-  animation: fadeIn 0.6s ease;
+  margin-bottom: 0.7rem;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.no-indicators { color: #7dd3fc; }
 
-/* Responsive Adjustments */
+/* Responsiveness */
 @media (max-width: 768px) {
   .input-grp {
     flex-direction: column;

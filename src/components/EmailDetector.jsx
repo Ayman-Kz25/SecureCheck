@@ -2,12 +2,48 @@ import React, { useState } from "react";
 
 /* --- Suspicious keyword / pattern rules --- */
 const suspiciousPatterns = [
-  { id: "urgency", label: "Uses urgency or threats", weight: 1.5, regex: /(urgent|immediately|act now|final warning|limited time|verify your identity|security alert|unusual activity|attention required|suspend|deactivate|expire|expired)/i },
-  { id: "credentials", label: "Requests password / credentials", weight: 1.5, regex: /(password|login|sign in|account verification|update your info|confirm details|reset your password|provide your credentials)/i },
-  { id: "links", label: "Contains suspicious or shortened links", weight: 1.5, regex: /(https?:\/\/|bit\.ly|tinyurl|ow\.ly|t\.co|redirect|verify-link|tracking\.)/i },
-  { id: "personal_info", label: "Requests personal/financial info", weight: 1.8, regex: /(ssn|social security|credit card|debit card|bank account|cvv|pin|account number|billing information)/i },
-  { id: "suspicious_offer", label: "Mentions prize/reward or account action", weight: 1.2, regex: /(win|prize|reward|lottery|gift card|bonus|account (locked|suspended|deactivated|restricted))/i },
-  { id: "brand_spoof", label: "Mentions popular brand or fake support", weight: 1.2, regex: /(paypal|microsoft|apple|amazon|google|facebook|instagram|outlook|netflix|bank of|support team|customer service)/i },
+  {
+    id: "urgency",
+    label: "Uses urgency or threats",
+    weight: 1.5,
+    regex:
+      /(urgent|immediately|act now|final warning|limited time|verify your identity|security alert|unusual activity|attention required|suspend|deactivate|expire|expired)/i,
+  },
+  {
+    id: "credentials",
+    label: "Requests password / credentials",
+    weight: 1.5,
+    regex:
+      /(password|login|sign in|account verification|update your info|confirm details|reset your password|provide your credentials)/i,
+  },
+  {
+    id: "links",
+    label: "Contains suspicious or shortened links",
+    weight: 1.5,
+    regex:
+      /(https?:\/\/|bit\.ly|tinyurl|ow\.ly|t\.co|redirect|verify-link|tracking\.)/i,
+  },
+  {
+    id: "personal_info",
+    label: "Requests personal/financial info",
+    weight: 1.8,
+    regex:
+      /(ssn|social security|credit card|debit card|bank account|cvv|pin|account number|billing information)/i,
+  },
+  {
+    id: "suspicious_offer",
+    label: "Mentions prize/reward or account action",
+    weight: 1.2,
+    regex:
+      /(win|prize|reward|lottery|gift card|bonus|account (locked|suspended|deactivated|restricted))/i,
+  },
+  {
+    id: "brand_spoof",
+    label: "Mentions popular brand or fake support",
+    weight: 1.2,
+    regex:
+      /(paypal|microsoft|apple|amazon|google|facebook|instagram|outlook|netflix|bank of|support team|customer service)/i,
+  },
 ];
 
 /* A small set of common English words for a lightweight "dictionary" heuristic */
@@ -31,12 +67,18 @@ function extractEmailAndName(fromText) {
 
   // If not found inside <>, try a simple email regex somewhere in the text
   if (!email) {
-    const simple = fromText.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+    const simple = fromText.match(
+      /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
+    );
     email = simple ? simple[1] : null;
   }
 
   // Name = what's left after removing email and angle brackets
-  const name = fromText.replace(/<?([^<>]+@[^<>]+)>?/g, "").replace(/[()"'<>]/g, "").trim() || null;
+  const name =
+    fromText
+      .replace(/<?([^<>]+@[^<>]+)>?/g, "")
+      .replace(/[()"'<>]/g, "")
+      .trim() || null;
 
   return { email, name };
 }
@@ -73,14 +115,16 @@ function analyzeTextIrregularities(text) {
   // word-level metrics
   const tokens = clean.split(/\s+/).filter(Boolean);
   const totalWords = tokens.length;
-  const alphaWords = tokens.map(w => w.replace(/[^A-Za-z']/g, ""));
-  const allCapsCount = alphaWords.filter(w => w.length >= 2 && /^[A-Z']+$/.test(w)).length;
+  const alphaWords = tokens.map((w) => w.replace(/[^A-Za-z']/g, ""));
+  const allCapsCount = alphaWords.filter(
+    (w) => w.length >= 2 && /^[A-Z']+$/.test(w)
+  ).length;
   result.allCapsRatio = allCapsCount / Math.max(1, totalWords);
 
   // unknown/common word heuristic
   let known = 0;
   let short = 0;
-  alphaWords.forEach(w => {
+  alphaWords.forEach((w) => {
     const lw = w.toLowerCase();
     if (commonWords.has(lw)) known++;
     if (lw.length <= 2) short++;
@@ -113,7 +157,12 @@ export default function EmailPhishingDetector() {
     // 1) Pattern matches
     suspiciousPatterns.forEach((p) => {
       if (p.regex.test(emailText)) {
-        findings.push({ kind: "pattern", label: p.label, id: p.id, weight: p.weight });
+        findings.push({
+          kind: "pattern",
+          label: p.label,
+          id: p.id,
+          weight: p.weight,
+        });
         baseScore += p.weight;
       }
     });
@@ -122,42 +171,89 @@ export default function EmailPhishingDetector() {
     const linkMatches = emailText.match(/([a-zA-Z0-9._-]+:\/\/[^\s]+)/g) || [];
     const httpCount = (emailText.match(/https?:\/\//g) || []).length;
     if (httpCount > 0) {
-      findings.push({ kind: "meta", label: `${httpCount} link(s) detected`, id: "link_count", weight: Math.min(1.5, httpCount * 0.6) });
+      findings.push({
+        kind: "meta",
+        label: `${httpCount} link(s) detected`,
+        id: "link_count",
+        weight: Math.min(1.5, httpCount * 0.6),
+      });
       baseScore += Math.min(1.5, httpCount * 0.6);
     }
 
     // suspicious TLD occurrences inside text
-    const suspiciousDomainMatches = (emailText.match(/\b[A-Za-z0-9.-]+\.(ru|cn|tk|xyz|top|gq|ml|cf)\b/gi) || []).length;
+    const suspiciousDomainMatches = (
+      emailText.match(/\b[A-Za-z0-9.-]+\.(ru|cn|tk|xyz|top|gq|ml|cf)\b/gi) || []
+    ).length;
     if (suspiciousDomainMatches > 0) {
-      findings.push({ kind: "meta", label: `Suspicious TLDs found (${suspiciousDomainMatches})`, id: "susp_tld", weight: 1 });
+      findings.push({
+        kind: "meta",
+        label: `Suspicious TLDs found (${suspiciousDomainMatches})`,
+        id: "susp_tld",
+        weight: 1,
+      });
       baseScore += 1;
     }
 
     // 3) Sender checks
-    const { email: senderEmail, name: senderName } = extractEmailAndName(fromText);
+    const { email: senderEmail, name: senderName } =
+      extractEmailAndName(fromText);
     if (senderEmail) {
       const domain = domainFromEmail(senderEmail);
       // local part oddities (many digits or long random-looking string)
       const local = senderEmail.split("@")[0];
-      if (/\d{4,}/.test(local) || /[_-]{3,}/.test(local) || /^[0-9a-f]{8,}$/i.test(local)) {
-        findings.push({ kind: "sender", label: `Suspicious sender local-part: ${local}`, id: "sender_local", weight: 1 });
+      if (
+        /\d{4,}/.test(local) ||
+        /[_-]{3,}/.test(local) ||
+        /^[0-9a-f]{8,}$/i.test(local)
+      ) {
+        findings.push({
+          kind: "sender",
+          label: `Suspicious sender local-part: ${local}`,
+          id: "sender_local",
+          weight: 1,
+        });
         baseScore += 1;
       }
       // suspicious TLD on sender domain
       if (isSuspiciousTLD(domain)) {
-        findings.push({ kind: "sender", label: `Sender domain uses suspicious TLD: ${domain}`, id: "sender_tld", weight: 1.5 });
+        findings.push({
+          kind: "sender",
+          label: `Sender domain uses suspicious TLD: ${domain}`,
+          id: "sender_tld",
+          weight: 1.5,
+        });
         baseScore += 1.5;
       }
       // display name / domain mismatch heuristic: display contains brand but email domain not matching brand
-      if (senderName && /paypal|microsoft|apple|amazon|google|netflix|bank|support/i.test(senderName) && domain && !new RegExp("(paypal|microsoft|apple|amazon|google|netflix|bank|outlook|paypal)", "i").test(domain)) {
-        findings.push({ kind: "sender", label: `Display name mentions brand but sender domain (${domain}) doesn't match`, id: "display_domain_mismatch", weight: 1.5 });
+      if (
+        senderName &&
+        /paypal|microsoft|apple|amazon|google|netflix|bank|support/i.test(
+          senderName
+        ) &&
+        domain &&
+        !new RegExp(
+          "(paypal|microsoft|apple|amazon|google|netflix|bank|outlook|paypal)",
+          "i"
+        ).test(domain)
+      ) {
+        findings.push({
+          kind: "sender",
+          label: `Display name mentions brand but sender domain (${domain}) doesn't match`,
+          id: "display_domain_mismatch",
+          weight: 1.5,
+        });
         baseScore += 1.5;
       }
     } else {
       // No sender email found in header text — suspicious if empty and inline instruction present
       if (/from:|sender:|reply-to:/i.test(fromText) || fromText.trim() !== "") {
         // If user typed something poorly formatted
-        findings.push({ kind: "sender", label: "Unable to parse sender email; check header format", id: "sender_unparsed", weight: 0.8 });
+        findings.push({
+          kind: "sender",
+          label: "Unable to parse sender email; check header format",
+          id: "sender_unparsed",
+          weight: 0.8,
+        });
         baseScore += 0.8;
       }
     }
@@ -166,28 +262,59 @@ export default function EmailPhishingDetector() {
     const irr = analyzeTextIrregularities(emailText);
     const irrFindings = [];
     if (irr.nonAlphaRatio > 0.25) {
-      irrFindings.push({ label: `High non-alpha character ratio (${(irr.nonAlphaRatio*100).toFixed(0)}%)`, id: "nonalpha", weight: 1 });
+      irrFindings.push({
+        label: `High non-alpha character ratio (${(
+          irr.nonAlphaRatio * 100
+        ).toFixed(0)}%)`,
+        id: "nonalpha",
+        weight: 1,
+      });
       baseScore += 1;
     }
     if (irr.unknownWordRate > 0.45) {
-      irrFindings.push({ label: `High unknown-word rate (${(irr.unknownWordRate*100).toFixed(0)}%) — many uncommon or misspelled words`, id: "unknownwords", weight: 1.5 });
+      irrFindings.push({
+        label: `High unknown-word rate (${(irr.unknownWordRate * 100).toFixed(
+          0
+        )}%) — many uncommon or misspelled words`,
+        id: "unknownwords",
+        weight: 1.5,
+      });
       baseScore += 1.5;
     }
     if (irr.allCapsRatio > 0.1) {
-      irrFindings.push({ label: `Many ALL-CAPS words (${(irr.allCapsRatio*100).toFixed(0)}%)`, id: "allcaps", weight: 0.8 });
+      irrFindings.push({
+        label: `Many ALL-CAPS words (${(irr.allCapsRatio * 100).toFixed(0)}%)`,
+        id: "allcaps",
+        weight: 0.8,
+      });
       baseScore += 0.8;
     }
     if (irr.repeatedPunctSeq) {
-      irrFindings.push({ label: "Repeated punctuation sequences detected (e.g. !!! or ...)", id: "reppunct", weight: 0.6 });
+      irrFindings.push({
+        label: "Repeated punctuation sequences detected (e.g. !!! or ...)",
+        id: "reppunct",
+        weight: 0.6,
+      });
       baseScore += 0.6;
     }
     if (irr.shortWordRatio > 0.45 && irr.unknownWordRate > 0.6) {
-      irrFindings.push({ label: "Many short or token-like words — text may be obfuscated", id: "shorttokens", weight: 1 });
+      irrFindings.push({
+        label: "Many short or token-like words — text may be obfuscated",
+        id: "shorttokens",
+        weight: 1,
+      });
       baseScore += 1;
     }
 
     // add irrFindings to findings
-    irrFindings.forEach(f => findings.push({ kind: "irregular", label: f.label, id: f.id, weight: f.weight }));
+    irrFindings.forEach((f) =>
+      findings.push({
+        kind: "irregular",
+        label: f.label,
+        id: f.id,
+        weight: f.weight,
+      })
+    );
 
     // 5) Final scoring / thresholds
     // baseScore now sums weighted signals. Apply final adjustments:
@@ -196,19 +323,27 @@ export default function EmailPhishingDetector() {
     let finalScore = baseScore;
 
     // optional: penalize very short emails with a link (common phishing style)
-    if (emailText.trim().length < 80 && (emailText.match(/https?:\/\//g) || []).length >= 1) {
+    if (
+      emailText.trim().length < 80 &&
+      (emailText.match(/https?:\/\//g) || []).length >= 1
+    ) {
       finalScore += 1.2;
-      findings.push({ kind: "meta", label: "Short message with link — suspicious", id: "short_with_link", weight: 1.2 });
+      findings.push({
+        kind: "meta",
+        label: "Short message with link — suspicious",
+        id: "short_with_link",
+        weight: 1.2,
+      });
     }
 
     // save details
     setResults(findings);
-    setScoreDetails([{ label: "Raw score", value: finalScore }]);
+    setScoreDetails([{ label: "Raw score", value: finalScore.toFixed(2) }]);
 
     // Risk thresholds (tunable)
-    let level = "Low";
-    if (finalScore >= 3.5 && finalScore < 6) level = "Medium";
-    else if (finalScore >= 6) level = "High";
+    let level = "low";
+    if (finalScore >= 2.5 && finalScore < 5) level = "Medium";
+    else if (finalScore >= 5) level = "High";
 
     setRisk(level);
   };
@@ -220,67 +355,85 @@ export default function EmailPhishingDetector() {
   };
 
   return (
-    <div className="page" style={{ maxWidth: 900, margin: "1.5rem auto", padding: 16 }}>
-      <div className="card" style={{ padding: 18 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
-          <h2 style={{ margin: 0 }}>Phishing Email Detector</h2>
+    <div className="page">
+      <div className="card">
+        <div className="card-header">
+          <h2>Phishing Email Detector</h2>
           <a href="/SecureCheck/">Back To Home</a>
         </div>
 
-        <label style={{ display: "block", marginBottom: 6, fontSize: 13 }}>Sender (From header or sender string):</label>
+        <label>Sender (From header or sender string):</label>
         <input
           value={fromText}
           onChange={(e) => setFromText(e.target.value)}
-          placeholder='e.g. "PayPal Support <no-reply@paypal.com>" or "no-reply@paypal.com"'
-          style={{ width: "100%", padding: "8px 10px", marginBottom: 12 }}
+          placeholder='e.g. "PayPal Support <no-reply@paypal.com>"'
         />
 
-        <label style={{ display: "block", marginBottom: 6, fontSize: 13 }}>Email body / full message:</label>
+        <label>Email body / full message:</label>
         <textarea
           value={emailText}
           onChange={(e) => setEmailText(e.target.value)}
           placeholder="Paste the email contents here..."
           rows={10}
-          style={{ width: "100%", padding: 10, marginBottom: 12 }}
         />
 
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={analyzeEmail} style={{ padding: "8px 14px", cursor: "pointer" }}>Analyze</button>
-          <button onClick={() => { setEmailText(""); setFromText(""); setResults([]); setRisk(null); setScoreDetails([]); }} style={{ padding: "8px 14px" }}>Clear</button>
+        <div className="btn-row">
+          <button onClick={analyzeEmail} className="primary-btn">
+            Analyze
+          </button>
+          <button
+            onClick={() => {
+              setEmailText("");
+              setFromText("");
+              setResults([]);
+              setRisk(null);
+              setScoreDetails([]);
+            }}
+            className="secondary-btn"
+          >
+            Clear
+          </button>
         </div>
 
         {risk && (
-          <div style={{ marginTop: 18 }}>
-            <h3 style={{ marginBottom: 8 }}>Risk Level: <span style={{ color: getRiskColor(risk) }}>{risk}</span></h3>
-            <div style={{ height: 12, background: "#e6e6e6", borderRadius: 6, overflow: "hidden", marginBottom: 10 }}>
-              <div style={{ height: "100%", background: getRiskColor(risk), width: risk === "Low" ? "33%" : risk === "Medium" ? "66%" : "100%" }} />
+          <div className="risk-section">
+            <h3>
+              Risk Level:{" "}
+              <span className={`risk-text ${getRiskColor(risk)}`}>{risk}</span>
+            </h3>
+            <div className="risk-bar">
+              <div
+                className="risk-bar-fill"
+                style={{ backgroundColor: getRiskColor(risk) }}
+              ></div>
             </div>
-            <div style={{ fontSize: 13, color: "#444" }}>
-              {scoreDetails.map((s, i) => <div key={i}>{s.label}: {s.value}</div>)}
+
+            <div className="score-details">
+              {scoreDetails.map((s, i) => (
+                <div key={i}>
+                  {s.label}: {s.value}
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        <div style={{ marginTop: 14 }}>
+        <div className="results-section">
           {results.length > 0 ? (
-            <ul style={{ paddingLeft: 18 }}>
+            <ul className="results-list">
               {results.map((r, idx) => (
-                <li key={idx} style={{ marginBottom: 6 }}>
+                <li key={idx}>
                   <strong>[{r.kind}]</strong> {r.label}
                 </li>
               ))}
             </ul>
           ) : (
-            risk && <p style={{ color: "#2563eb" }}>No strong phishing indicators detected.</p>
+            risk && (
+              <p className="no-indicators">
+                No strong phishing indicators detected.
+              </p>
+            )
           )}
-        </div>
-
-        <div style={{ marginTop: 12, fontSize: 12, color: "#6b7280" }}>
-          <p style={{ margin: 0 }}>
-            Note: This is a heuristic-based detector (no ML). It improves detection of many phishing
-            patterns but can produce false positives/negatives. For best results, paste the full message
-            including headers (From:, Reply-To:, message body).
-          </p>
         </div>
       </div>
     </div>
