@@ -40,7 +40,7 @@ function App(){
     return(
         <Routes>
             <Route path="/" element={< Home />}/>
-            <Route path="/password" element={<PasswordAnalyzer/>}/>
+            <Route path="/password" element={<PasswordAnalyzer/>} />
             <Route path="/url" element={<UrlDetector/>}/>
             <Route path="/email" element={<EmailDetector/>}/>
         </Routes>
