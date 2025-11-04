@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 
 const suspiciousPatterns = [
-  { id: 1, label: "Contains urgent phrases", regex: /(urgent|immediately|asap|verify now|act fast)/i },
-  { id: 2, label: "Contains password or OTP requests", regex: /(password|otp|one time code|pin|credential)/i },
-  { id: 3, label: "Suspicious links detected", regex: /(bit\.ly|tinyurl\.|http:\/\/|https:\/\/(?!www\.|mail\.|accounts\.))/i },
-  { id: 4, label: "Requests personal info", regex: /(ssn|credit card|bank account|security number)/i },
-  { id: 5, label: "Sender mentions account suspension or restriction", regex: /(account (suspended|restricted|locked|deactivated))/i },
+  { id: 1, label: "Uses urgency or threats", regex: /(urgent|immediately|act now|final warning|limited time|verify your identity|security alert|unusual activity|attention required|suspend|deactivate)/i },
+  
+  { id: 2, label: "Requests password or credentials", regex: /(password|login|account verification|update your info|confirm details|reset your password|sign in)/i },
+  
+  { id: 3, label: "Contains suspicious or shortened links", regex: /(http:\/\/|https:\/\/(?!www\.|mail\.|accounts\.)|bit\.ly|tinyurl|redirect|verify-link|tracking\.|go\.|securelogin)/i },
+  
+  { id: 4, label: "Requests personal or financial information", regex: /(ssn|social security|credit card|debit card|bank|cvv|pin|account number|personal details|billing)/i },
+  
+  { id: 5, label: "Mentions account suspension, restriction, or prize", regex: /(account (locked|deactivated|suspended|restricted|expired)|win|prize|reward|lottery|gift card|bonus)/i },
+  
+  { id: 6, label: "Spoofed brand names or fake support", regex: /(paypal|microsoft|apple|amazon|facebook|instagram|google|outlook|netflix|delivery|support team)/i },
+  
+  { id: 7, label: "Contains mixed languages or random text patterns", regex: /([a-zA-Z]+\d+[a-zA-Z]+|[а-яА-ЯёЁ]+|[#@$%^&*]{3,})/i },
 ];
 
 export default function EmailPhishingDetector() {
