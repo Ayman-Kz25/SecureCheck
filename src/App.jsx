@@ -1,8 +1,8 @@
 import React from "react";
-import PasswordAnalyzer from "/components/PasswordAnalyzer";
-import UrlDetector from "/components/UrlDetector";
-import EmailDetector from "/components/EmailDetector";
-import "/App.css";
+import PasswordAnalyzer from "./components/PasswordAnalyzer";
+import UrlDetector from "./components/UrlDetector";
+import EmailDetector from "./components/EmailDetector";
+import "./App.css";
 import { Route, Routes, Link } from "react-router-dom";
 
 function Home() {
