@@ -1,4 +1,11 @@
 import React, { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+
+library.add(fas, far, fab)
 
 function isIPv4(host) {
   return /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host);
@@ -123,7 +130,7 @@ return (
               <ul>
                 {result.flags.map((f, i) => (
                   <li key={i}>
-                    <i className="fa-solid fa-triangle-exclamation"></i>
+                    <FontAwesomeIcon icon="fa-solid fa-triangle-exclamation" />
                     {f}
                   </li>
                 ))}

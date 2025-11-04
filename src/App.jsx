@@ -4,6 +4,12 @@ import UrlDetector from "./components/UrlDetector";
 import EmailDetector from "./components/EmailDetector";
 import "./App.css";
 import { Route, Routes, Link } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+library.add(fas, far, fab)
 
 function Home() {
   return (
@@ -16,13 +22,13 @@ function Home() {
       </div>
       <div className="nav-buttons">
         <Link to="/password" className="btn">
-          <i className="fa-solid fa-key"></i> Password Strength Checker
+          <FontAwesomeIcon icon="fa-solid fa-key" /> Password Strength Checker
         </Link>
         <Link to="/url" className="btn">
-          <i className="fa-solid fa-link"></i> Malicious URL Detector
+          <FontAwesomeIcon icon="fa-solid fa-link" /> Malicious URL Detector
         </Link>
         <Link to="/email" className="btn">
-          <i className="fa-solid fa-envelope"></i> Phishing Email Detector
+          <FontAwesomeIcon icon="fa-solid fa-envelope" /> Phishing Email Detector
         </Link>
       </div>
 

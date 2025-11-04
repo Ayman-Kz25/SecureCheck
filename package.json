@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://ayman-kz25.github.io/SecureCheck",
+  "moduleResolution": "bundler",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,6 +12,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.1.0",
+    "@fortawesome/free-brands-svg-icons": "^7.1.0",
+    "@fortawesome/free-regular-svg-icons": "^7.1.0",
+    "@fortawesome/free-solid-svg-icons": "^7.1.0",
+    "@fortawesome/react-fontawesome": "^3.1.0",
     "docs": "^0.3.2-canary.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

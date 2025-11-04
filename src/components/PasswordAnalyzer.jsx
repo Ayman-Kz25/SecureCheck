@@ -1,4 +1,11 @@
 import React, { useState, useMemo } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+
+library.add(fas, far, fab)
 import '../App.css'
 
 const RULES = [
@@ -93,7 +100,7 @@ function PasswordAnalyzer() {
         <ul className="checklist">
           {passed.map((r) => (
             <li key={r.id} className={r.ok ? "ok" : ""}>
-              {r.ok ? <i class="fa-solid fa-check"></i> : ""}
+              {r.ok ? <FontAwesomeIcon icon="fa-solid fa-check"  /> : ""}
               {r.label}
             </li>
           ))}
