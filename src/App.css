@@ -168,7 +168,7 @@ footer strong {
 }
 
 .input-grp input:focus {
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.1);
 }
 
 .input-grp button {
@@ -180,12 +180,11 @@ footer strong {
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
+    transition: transform 0.3s ease;
 }
 
 .input-grp button:hover {
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
 }
 
 /* Password Analyzer Page */
@@ -323,7 +322,7 @@ footer strong {
 
 /* Phishing Email Detector Page */
 .card label {
-    color: #f1f5f9;
+    color: #f4b1c2;
     margin-bottom: 5px;
 }
 
